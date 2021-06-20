@@ -14,6 +14,8 @@ class Config(BaseConfig):
     IS_STATEFUL = ConfigProperty(property_type=BooleanType(), default=True)
     MAX_PAGE = ConfigProperty(property_type=IntType(), default=2000)
     START_URLS = ConfigProperty(property_type=StringType(), default='start.txt')
+    JSON_OUT_PATH = ConfigProperty(property_type=StringType(), default='.')
+
 
 
 loaders = [EnvLoader()]

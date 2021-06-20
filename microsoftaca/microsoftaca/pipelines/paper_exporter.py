@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import json
 import os
 import shutil
 from scrapy.exporters import JsonLinesItemExporter
@@ -13,8 +14,16 @@ class PaperExporterPipeline:
         self.exporter = None
 
     def close_spider(self, spider):
-        self.exporter.finish_exporting()
+        self._get_exporter().finish_exporting()
         self.exporter.file.close()
+        filename = os.path.join(config.PAPER_PATH, 'papers.jl')
+        papers = []
+        with open(filename, 'r') as f:
+            for index, line in enumerate(f):
+                paper = json.loads(line)
+                papers.append(paper)
+        with open(os.path.join(config.JSON_OUT_PATH, "CrawledPapers.json"), 'w') as f:
+            json.dump(papers, f)
 
     def _get_exporter(self):
         if not self.exporter:

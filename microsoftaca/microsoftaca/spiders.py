@@ -59,6 +59,8 @@ class MicrosoftacaSpider(scrapy.Spider):
 
     def parse(self, response):
         if len(self.titles.keys()) >= config.MAX_PAGE:
+            if not self.blocked:
+                raise CloseSpider()
             return
         paper_id = str(response.url.split('/')[-2])
         single_fields_selectors = {

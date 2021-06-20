@@ -2,6 +2,9 @@
 from scrapy import signals
 from scrapy.exceptions import IgnoreRequest
 
+from config import config
+from microsoftaca.loaders.papers import load_titles_from_jl
+
 
 class MicrosoftacaSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
@@ -55,4 +58,6 @@ class MicrosoftacaSpiderMiddleware:
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
 
-
+        if config.IS_STATEFUL is True:
+            titles_dict = load_titles_from_jl()
+            spider.titles = titles_dict

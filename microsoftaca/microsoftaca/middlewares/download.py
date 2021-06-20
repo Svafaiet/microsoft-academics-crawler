@@ -3,6 +3,8 @@
 from scrapy import signals
 from scrapy.exceptions import IgnoreRequest
 
+from config import config
+from microsoftaca.loaders.papers import load_titles_from_jl
 from microsoftaca.microsoftaca import settings
 
 
@@ -63,5 +65,6 @@ class MicrosoftacaDownloaderMiddleware:
         spider.logger.info('Spider opened: %s' % spider.name)
 
     def spider_closed(self, spider):
-        spider.crawler.engine.slot.scheduler.close()
+        if spider.blocked:
+            spider.crawler.engine.slot.scheduler.close("end of crawl")
 

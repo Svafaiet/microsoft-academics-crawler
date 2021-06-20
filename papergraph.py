@@ -65,10 +65,11 @@ class PaperGraph:
         return x
 
 
-pg = PaperGraph()
-pg.load_graph()
-print(pg.get_pagerank())
-print(pg._normalize(np.matmul(pg.get_pagerank(), pg.gmatrix)))
+if __name__ == '__main__':
+    pg = PaperGraph()
+    pg.load_graph()
+    print(pg.get_pagerank())
+    print(pg._normalize(np.matmul(pg.get_pagerank(), pg.gmatrix)))
 
 
 

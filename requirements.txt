@@ -4,3 +4,5 @@ scrapy-splash==0.7.2
 grift==0.7.1
 fake-useragent==0.1.11
 numpy==1.19.2
+typer>=0.3, <0.4
+click_spinner==0.1.10

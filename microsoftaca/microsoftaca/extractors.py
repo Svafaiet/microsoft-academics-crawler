@@ -1,3 +1,5 @@
+import os
+
 from scrapy.crawler import Crawler, CrawlerProcess
 
 import logging
@@ -17,7 +19,7 @@ class MicrosoftacaExtractor:
         runner = CrawlerProcess(self.settings)
         settings = self.settings.copy()
         lua=""
-        with open("microsoftaca/microsoftaca.lua") as f:
+        with open(os.path.join("microsoftaca", "microsoftaca.lua")) as f:
             lua = "\n".join(f.readlines())
         start_urls = load_start_urls()
 
