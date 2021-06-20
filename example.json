@@ -1,0 +1,11 @@
+{
+	"id": "Unique ID of the paper",
+	"title": "Title of the paper",
+	"abstract": "Abstract of the paper",
+	"date": "Publication year",
+	"authors": ["Name of the first author", ..., "Name of the last author"],
+	"related_topics": ["ID of the first related topic", ..., "ID of third related topic"],
+	"citation_count":"number of citations of the paper",
+	"reference_count":"number of references of the paper",
+	"references": ["ID of the first reference", ..., "ID of the tenth reference"]
+}
