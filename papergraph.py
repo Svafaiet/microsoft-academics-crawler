@@ -14,9 +14,13 @@ class PaperGraph:
         self.gmatrix = None
         self.alpha = 0.1
         self.threshhold = 0.001
+        self.node_mapping = {}
 
     def get_graph(self):
         return self.graph.copy()
+
+    def get_node_mapping(self):
+        return self.node_mapping.copy()
 
     def _normalize(self, v):
         v = np.array(v)
@@ -26,13 +30,18 @@ class PaperGraph:
         return v / norm
 
     def load_graph(self, filename=None):
-        filename = filename or os.path.join(config.PAPER_PATH, 'papers.jl')
-        node_mapping = {}
+        filename = str(filename or os.path.join(config.PAPER_PATH, 'papers.jl'))
+        self.node_mapping = {}
         node_order = []
         with open(filename, 'r') as f:
-            for index, line in enumerate(f):
-                paper = json.loads(line)
-                node_mapping[paper['id']] = index
+            def paper_iterator():
+                if filename.lower().split(".")[-1] == "jl":
+                    return (json.loads(line) for line in f)
+                elif filename.lower().split(".")[-1] == "json":
+                    return json.load(f)
+
+            for index, paper in enumerate(paper_iterator()):
+                self.node_mapping[paper['id']] = index
                 self.graph[paper['id']] = set(paper['references'])
                 node_order.append(paper['id'])
         page_count = len(node_order)
@@ -41,7 +50,7 @@ class PaperGraph:
             self.graph[node_id] = set(filter(lambda paper_id: paper_id in self.graph, self.graph[node_id]))
         for index, node_id in enumerate(node_order):
             neighbour_indices = list(
-                node_mapping[neighbour] for neighbour in self.graph[node_id]
+                self.node_mapping[neighbour] for neighbour in self.graph[node_id]
             )
             self.gmatrix[index] = self._normalize(np.array(list(
                 int(i in neighbour_indices) for i in range(page_count)
@@ -64,12 +73,22 @@ class PaperGraph:
         print(f"Calculated page rank after {iterations} iterations")
         return x
 
+    def output(self, page_rank, filepath=None):
+        filename = os.path.join(filepath or ".", "PageRank.json")
+        paper_ranks = dict()
+        for paper_id, index in self.node_mapping.items():
+            paper_ranks[paper_id] = page_rank[index]
+        with open(filename, 'w') as f:
+            json.dump(paper_ranks, f)
+
 
 if __name__ == '__main__':
     pg = PaperGraph()
     pg.load_graph()
-    print(pg.get_pagerank())
+    pr = pg.get_pagerank()
+    print(pr)
     print(pg._normalize(np.matmul(pg.get_pagerank(), pg.gmatrix)))
+    pg.output(pr)
 
 
 
