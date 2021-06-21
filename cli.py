@@ -10,6 +10,7 @@ from hits import Hits
 from microsoftaca.extractor_process import extractor_process
 from papergraph import PaperGraph
 from recommender import Recommender, make_profile
+from recovery import Recovery
 
 cli = typer.Typer(
     name="microaca",
@@ -216,6 +217,49 @@ def suggest_profile(
             top_profiles[i][0],
             top_profiles[i][1],
             top_profiles[i][2].tolist()))
+
+
+@cli.command("recover")
+def recover(
+        inputf: typing.Optional[Path] = typer.Option(
+            None,
+            "--input",
+            "-i",
+            help="path to read user profiles (.csv file)",
+            atomic=True,
+            is_eager=True,
+        ),
+        output: typing.Optional[Path] = typer.Option(
+            ".",
+            "--output",
+            "-o",
+            help="directory to write Q.txt and P.txt",
+            atomic=True,
+            is_eager=True,
+        ),
+        max_iter: int = typer.Option(
+            10,
+            "--iter",
+            help="number of iterations to learn",
+        ),
+        alpha: float = typer.Option(
+            0.5,
+            "-a",
+            "--alpha",
+            help="learning ratio",
+        ),
+):
+    """
+        Use recover -i "<path-to-json-dir>/data.csv" -o "<dir>"
+
+        Page rank json will be written in <dir>/P.txt and <dir>/Q.txt
+    """
+    recovery = Recovery()
+    recovery.load_profiles(user_topics=inputf)
+    recovery.recover(max_iter=max_iter, alpha=alpha)
+    recovery.output(output)
+
+
 
 
 if __name__ == '__main__':
