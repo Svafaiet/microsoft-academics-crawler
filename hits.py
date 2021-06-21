@@ -18,18 +18,10 @@ class Hits:
         graph = pg.get_graph()
         authors_to_paper_id = defaultdict(set)
         papers_dict = dict()
-        filename = str(filename or os.path.join(config.PAPER_PATH, 'papers.jl'))
-        with open(filename, 'r') as f:
-            def paper_iterator():
-                if filename.lower().split(".")[-1] == "jl":
-                    return (json.loads(line) for line in f)
-                elif filename.lower().split(".")[-1] == "json":
-                    return json.load(f)
-
-            for index, paper in enumerate(paper_iterator()):
-                papers_dict[paper['id']] = paper
-                for author in paper['authors']:
-                    authors_to_paper_id[author.lower()].add(paper['id'])
+        for index, paper in enumerate(PaperGraph.paper_iterator(filename)):
+            papers_dict[paper['id']] = paper
+            for author in paper['authors']:
+                authors_to_paper_id[author.lower()].add(paper['id'])
         for author, papers in authors_to_paper_id.items():
             for paper in papers:
                 if paper not in graph:

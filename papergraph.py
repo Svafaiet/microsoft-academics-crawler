@@ -29,21 +29,24 @@ class PaperGraph:
             return v
         return v / norm
 
-    def load_graph(self, filename=None):
+    @staticmethod
+    def paper_iterator(filename):
         filename = str(filename or os.path.join(config.PAPER_PATH, 'papers.jl'))
+        with open(filename, 'r') as f:
+            def iterator():
+                if filename.lower().split(".")[-1] == "jl":
+                    return list(json.loads(line) for line in f)
+                elif filename.lower().split(".")[-1] == "json":
+                    return list(json.load(f))
+            return iterator()
+
+    def load_graph(self, filename=None):
         self.node_mapping = {}
         node_order = []
-        with open(filename, 'r') as f:
-            def paper_iterator():
-                if filename.lower().split(".")[-1] == "jl":
-                    return (json.loads(line) for line in f)
-                elif filename.lower().split(".")[-1] == "json":
-                    return json.load(f)
-
-            for index, paper in enumerate(paper_iterator()):
-                self.node_mapping[paper['id']] = index
-                self.graph[paper['id']] = set(paper['references'])
-                node_order.append(paper['id'])
+        for index, paper in enumerate(PaperGraph.paper_iterator(filename)):
+            self.node_mapping[paper['id']] = index
+            self.graph[paper['id']] = set(paper['references'])
+            node_order.append(paper['id'])
         page_count = len(node_order)
         self.gmatrix = [0]*page_count
         for node_id in self.graph:
